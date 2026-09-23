@@ -110,6 +110,7 @@ def trace_ontology(registry: OntologyRegistry, query: str) -> TraceResult:
     matched_domains: Set[str] = set()
     matched_rules: List[RuleSpec] = []
     affected_files: Set[str] = set()
+    exact_rule_match = any(q == rule.id.lower() for rule in registry.rules)
 
     # 0. Match Config domains
     if registry.config:
@@ -119,7 +120,7 @@ def trace_ontology(registry: OntologyRegistry, query: str) -> TraceResult:
 
     # 1. Match Rules (Direct rule search & enforcement extraction)
     for r in registry.rules:
-        is_rule_match = (
+        is_rule_match = q == r.id.lower() if exact_rule_match else (
             q in r.id.lower()
             or q in r.name.lower()
             or q in r.description.lower()
@@ -137,7 +138,7 @@ def trace_ontology(registry: OntologyRegistry, query: str) -> TraceResult:
 
     # 2. Search Objects
     for name, obj in registry.objects.items():
-        is_match = (
+        is_match = not exact_rule_match and (
             q in name.lower()
             or q in obj.description.lower()
             or (obj.domain and (q in obj.domain.lower() or obj.domain in matched_domains))
@@ -151,7 +152,7 @@ def trace_ontology(registry: OntologyRegistry, query: str) -> TraceResult:
 
     # 3. Search Actions
     for name, act in registry.actions.items():
-        is_match = (
+        is_match = not exact_rule_match and (
             q in name.lower()
             or q in act.description.lower()
             or (act.domain and (q in act.domain.lower() or act.domain in matched_domains))
@@ -169,7 +170,7 @@ def trace_ontology(registry: OntologyRegistry, query: str) -> TraceResult:
 
     # 4. Search Functions
     for name, fn in registry.functions.items():
-        is_match = (
+        is_match = not exact_rule_match and (
             q in name.lower()
             or q in fn.description.lower()
             or (fn.domain and (q in fn.domain.lower() or fn.domain in matched_domains))
@@ -183,7 +184,7 @@ def trace_ontology(registry: OntologyRegistry, query: str) -> TraceResult:
 
     # 5. Populate Rules that intersect with matched objects
     for r in registry.rules:
-        if r not in matched_rules:
+        if not exact_rule_match and r not in matched_rules:
             if any(o in matched_obj_names for o in r.scope):
                 matched_rules.append(r)
                 if r.enforcement:

@@ -81,26 +81,19 @@ def _check_binding(
 ) -> None:
     if not binding:
         return
+    _check_path_values(root, binding.model_dump(by_alias=True, exclude_none=True), context, issues, strict)
 
-    if binding.backend:
-        if binding.backend.model:
-            _verify_code_path(root, binding.backend.model, f"{context} -> backend.model", issues, strict)
-        if binding.backend.schema_:
-            _verify_code_path(root, binding.backend.schema_, f"{context} -> backend.schema", issues, strict)
-        if binding.backend.service:
-            _verify_code_path(root, binding.backend.service, f"{context} -> backend.service", issues, strict)
 
-    if binding.frontend:
-        if binding.frontend.entity:
-            _verify_code_path(root, binding.frontend.entity, f"{context} -> frontend.entity", issues, strict)
-        if binding.frontend.feature:
-            _verify_code_path(root, binding.frontend.feature, f"{context} -> frontend.feature", issues, strict)
-
-    if binding.mobile:
-        if binding.mobile.model:
-            _verify_code_path(root, binding.mobile.model, f"{context} -> mobile.model", issues, strict)
-        if binding.mobile.viewmodel:
-            _verify_code_path(root, binding.mobile.viewmodel, f"{context} -> mobile.viewmodel", issues, strict)
+def _check_path_values(root: Path, value: object, context: str, issues: List[LintIssue], strict: bool) -> None:
+    """Check every declared code path, including nested UI and enforcement maps."""
+    if isinstance(value, dict):
+        for key, nested in value.items():
+            _check_path_values(root, nested, f"{context}.{key}", issues, strict)
+    elif isinstance(value, list):
+        for nested in value:
+            _check_path_values(root, nested, context, issues, strict)
+    elif isinstance(value, str):
+        _verify_code_path(root, value, context, issues, strict)
 
 
 def lint_ontology(
@@ -185,18 +178,7 @@ def lint_ontology(
                 )
 
         if check_code and rule.enforcement:
-            if isinstance(rule.enforcement, dict):
-                for enf_type, enf_list in rule.enforcement.items():
-                    if isinstance(enf_list, list):
-                        for p in enf_list:
-                            _verify_code_path(registry.root_path, p, f"Rule '{rule.id}' enforcement.{enf_type}", issues, strict_code)
-                    elif isinstance(enf_list, str):
-                        _verify_code_path(registry.root_path, enf_list, f"Rule '{rule.id}' enforcement.{enf_type}", issues, strict_code)
-            elif isinstance(rule.enforcement, list):
-                for p in rule.enforcement:
-                    _verify_code_path(registry.root_path, p, f"Rule '{rule.id}' enforcement", issues, strict_code)
-            elif isinstance(rule.enforcement, str):
-                _verify_code_path(registry.root_path, rule.enforcement, f"Rule '{rule.id}' enforcement", issues, strict_code)
+            _check_path_values(registry.root_path, rule.enforcement, f"Rule '{rule.id}' enforcement", issues, strict_code)
 
     # 5. Code binding checks
     if check_code:

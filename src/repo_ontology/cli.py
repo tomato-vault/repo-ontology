@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import sys
 from pathlib import Path
 from typing import Optional
 
@@ -19,6 +18,16 @@ from repo_ontology.scaffold import scaffold_element
 from repo_ontology.trace import trace_ontology
 
 console = Console()
+error_console = Console(stderr=True)
+
+
+def _report_load_errors(registry) -> bool:
+    """Prevent partial registries from appearing as successful info or trace results."""
+    if not registry.has_errors:
+        return False
+    for error in registry.errors:
+        error_console.print(f"[bold red]Ontology load error:[/bold red] {error}")
+    return True
 
 
 def cmd_init(args: argparse.Namespace) -> int:
@@ -29,7 +38,7 @@ def cmd_init(args: argparse.Namespace) -> int:
         console.print("Run '[cyan]otlg info[/cyan]' or '[cyan]otlg lint[/cyan]' to inspect the ontology.")
         return 0
     except Exception as e:
-        console.print(f"[bold red]Error:[/bold red] {e}", file=sys.stderr)
+        error_console.print(f"[bold red]Error:[/bold red] {e}")
         return 1
 
 
@@ -38,7 +47,9 @@ def cmd_info(args: argparse.Namespace) -> int:
     try:
         registry = load_ontology(target)
     except Exception as e:
-        console.print(f"[bold red]Error loading ontology:[/bold red] {e}", file=sys.stderr)
+        error_console.print(f"[bold red]Error loading ontology:[/bold red] {e}")
+        return 1
+    if _report_load_errors(registry):
         return 1
 
     project_name = "Project"
@@ -70,7 +81,7 @@ def cmd_lint(args: argparse.Namespace) -> int:
     try:
         registry = load_ontology(target)
     except Exception as e:
-        console.print(f"[bold red]Critical Error:[/bold red] {e}", file=sys.stderr)
+        error_console.print(f"[bold red]Critical Error:[/bold red] {e}")
         return 1
 
     issues = lint_ontology(
@@ -104,7 +115,9 @@ def cmd_trace(args: argparse.Namespace) -> int:
     try:
         registry = load_ontology(target)
     except Exception as e:
-        console.print(f"[bold red]Error loading ontology:[/bold red] {e}", file=sys.stderr)
+        error_console.print(f"[bold red]Error loading ontology:[/bold red] {e}")
+        return 1
+    if _report_load_errors(registry):
         return 1
 
     result = trace_ontology(registry, args.query)
@@ -128,7 +141,7 @@ def cmd_scaffold(args: argparse.Namespace) -> int:
         console.print(f"[bold green]✓[/bold green] Created new {args.element_type} specification: [bold]{out_file}[/bold]")
         return 0
     except Exception as e:
-        console.print(f"[bold red]Error:[/bold red] {e}", file=sys.stderr)
+        error_console.print(f"[bold red]Error:[/bold red] {e}")
         return 1
 
 
