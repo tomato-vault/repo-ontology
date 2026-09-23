@@ -94,10 +94,10 @@ class ObjectType(BaseModel):
     description: str
     properties: Dict[str, Union[PropertySpec, Dict[str, Any]]] = Field(default_factory=dict)
     code_binding: Optional[CodeBinding] = None
-    constraints: List[Union[str, Dict[str, Any]]] = Field(default_factory=list)
-    computed_properties: Union[Dict[str, Any], List[str]] = Field(default_factory=list)
-    relationships: List[Dict[str, Any]] = Field(default_factory=list)
-    enums: Dict[str, List[str]] = Field(default_factory=dict)
+    constraints: Union[Dict[str, Any], List[Any]] = Field(default_factory=list)
+    computed_properties: Union[Dict[str, Any], List[Any]] = Field(default_factory=dict)
+    relationships: Union[Dict[str, Any], List[Any]] = Field(default_factory=dict)
+    enums: Union[Dict[str, Any], List[Any]] = Field(default_factory=dict)
     actor: Optional[ActorSpec] = None
 
 
