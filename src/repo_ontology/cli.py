@@ -41,7 +41,14 @@ def cmd_info(args: argparse.Namespace) -> int:
         console.print(f"[bold red]Error loading ontology:[/bold red] {e}", file=sys.stderr)
         return 1
 
-    project_name = registry.config.project.get("name", "Project") if registry.config and registry.config.project else "Project"
+    project_name = "Project"
+    if registry.config:
+        if hasattr(registry.config.project, "name"):
+            project_name = registry.config.project.name
+        elif isinstance(registry.config.project, dict):
+            project_name = registry.config.project.get("name", "Project")
+        elif registry.config.name:
+            project_name = registry.config.name
     
     table = Table(title=f"Ontology Overview: {project_name}", border_style="cyan")
     table.add_column("Primitive", style="bold")

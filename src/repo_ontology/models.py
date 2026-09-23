@@ -150,7 +150,7 @@ class RuleSpec(BaseModel):
     domain: Optional[str] = None
     description: str
     scope: List[str] = Field(default_factory=list)
-    enforcement: Optional[Union[Dict[str, List[str]], List[str], str]] = None
+    enforcement: Optional[Union[Dict[str, Any], List[str], str]] = None
     severity: Optional[str] = None
     category: Optional[str] = None
     expression: Optional[str] = None
