@@ -172,7 +172,7 @@ def lint_ontology(
                     )
                 )
 
-    # 4. Rules scope integrity
+    # 4. Rules scope and enforcement integrity
     for rule in registry.rules:
         for scope_obj in rule.scope:
             if scope_obj not in registry.objects:
@@ -183,6 +183,20 @@ def lint_ontology(
                         message=f"Scope object '{scope_obj}' is not defined in objects/",
                     )
                 )
+
+        if check_code and rule.enforcement:
+            if isinstance(rule.enforcement, dict):
+                for enf_type, enf_list in rule.enforcement.items():
+                    if isinstance(enf_list, list):
+                        for p in enf_list:
+                            _verify_code_path(registry.root_path, p, f"Rule '{rule.id}' enforcement.{enf_type}", issues, strict_code)
+                    elif isinstance(enf_list, str):
+                        _verify_code_path(registry.root_path, enf_list, f"Rule '{rule.id}' enforcement.{enf_type}", issues, strict_code)
+            elif isinstance(rule.enforcement, list):
+                for p in rule.enforcement:
+                    _verify_code_path(registry.root_path, p, f"Rule '{rule.id}' enforcement", issues, strict_code)
+            elif isinstance(rule.enforcement, str):
+                _verify_code_path(registry.root_path, rule.enforcement, f"Rule '{rule.id}' enforcement", issues, strict_code)
 
     # 5. Code binding checks
     if check_code:
