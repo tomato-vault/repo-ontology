@@ -1,4 +1,4 @@
-# repo-ontology (onto)
+# repo-ontology (otlg)
 
 > **코드 레포지토리 전용 팔란티어급 실행형 온톨로지 템플릿 & CLI**  
 > "기억상실증 에이전트에게 10초 만에 도메인 불변식과 코드 지도를 복원해준다."
@@ -13,7 +13,7 @@
 - 수기 마크다운 명세(`docs/features/`)는 코드가 수정되면 drift(어긋남)가 발생합니다.
 - 데이터베이스 ERD는 명사(테이블 형태)만 보여줄 뿐, 시스템에서 허용되는 상태 변경(동사, Action)과 권한을 통제하지 못합니다.
 
-`repo-ontology`는 프로젝트 루트에 기계 가독형 `.ontology/` 명세를 구축하고, 정적 검증(`onto lint`)과 요구사항 초고속 역색인(`onto trace`)을 통해 문서와 코드의 정합성을 100%로 유지합니다.
+`repo-ontology`는 프로젝트 루트에 기계 가독형 `.ontology/` 명세를 구축하고, 정적 검증(`otlg lint`)과 요구사항 초고속 역색인(`otlg trace`)을 통해 문서와 코드의 정합성을 100%로 유지합니다.
 
 ---
 
@@ -32,21 +32,21 @@
 
 ```bash
 # 1. 새 프로젝트에 .ontology 스켈레톤 안착
-onto init [target-path]
+otlg init [target-path]
 
 # 2. 온톨로지 무결성 및 코드 바인딩 정적 검증
-onto lint [target-path]
+otlg lint [target-path]
 
 # 3. 요구사항 인입 시 관련 도메인/코드 즉시 역추적
-onto trace <query> [target-path]
-# 예: onto trace attendance
+otlg trace <query> [target-path]
+# 예: otlg trace attendance
 
 # 4. 온톨로지 등록 현황 요약
-onto info [target-path]
+otlg info [target-path]
 
 # 5. 새 객체/액션 스켈레톤 생성
-onto scaffold object <name>
-onto scaffold action <name>
+otlg scaffold object <name>
+otlg scaffold action <name>
 ```
 
 ---

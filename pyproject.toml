@@ -12,7 +12,7 @@ dependencies = [
 
 [project.scripts]
 repo-ontology = "repo_ontology.__main__:main"
-onto = "repo_ontology.__main__:main"
+otlg = "repo_ontology.__main__:main"
 
 [dependency-groups]
 dev = [

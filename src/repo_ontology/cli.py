@@ -26,7 +26,7 @@ def cmd_init(args: argparse.Namespace) -> int:
     try:
         dest = init_project(target, force=args.force)
         console.print(f"[bold green]✓[/bold green] Initialized repo-ontology template at: [bold]{dest}[/bold]")
-        console.print("Run '[cyan]onto info[/cyan]' or '[cyan]onto lint[/cyan]' to inspect the ontology.")
+        console.print("Run '[cyan]otlg info[/cyan]' or '[cyan]otlg lint[/cyan]' to inspect the ontology.")
         return 0
     except Exception as e:
         console.print(f"[bold red]Error:[/bold red] {e}", file=sys.stderr)
@@ -127,7 +127,7 @@ def cmd_scaffold(args: argparse.Namespace) -> int:
 
 def main(argv: Optional[list] = None) -> int:
     parser = argparse.ArgumentParser(
-        prog="onto",
+        prog="otlg",
         description="Palantir-grade domain ontology CLI for code repositories",
     )
     parser.add_argument("--version", "-v", action="version", version=f"%(prog)s {__version__}")

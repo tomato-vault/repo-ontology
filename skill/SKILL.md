@@ -1,6 +1,6 @@
 ---
 name: repo-ontology
-description: 코드베이스 도메인 온톨로지 역색인(onto trace) 및 정합성 검증(onto lint) 워크플로우
+description: 코드베이스 도메인 온톨로지 역색인(otlg trace) 및 정합성 검증(otlg lint) 워크플로우
 ---
 
 # repo-ontology SKILL
@@ -14,24 +14,24 @@ description: 코드베이스 도메인 온톨로지 역색인(onto trace) 및 �
 ```
 [1. 요구사항 인입]
        ↓
-[2. onto trace <keyword> 실행] ──> 도메인 객체, 불변식 가드(Preconditions), 수정 파일 목록 즉시 확보
+[2. otlg trace <keyword> 실행] ──> 도메인 객체, 불변식 가드(Preconditions), 수정 파일 목록 즉시 확보
        ↓
 [3. TDD 사이클 실행] ────────────> Preconditions를 테스트의 Given으로 설정하여 기능 개발
        ↓
-[4. onto lint 실행] ─────────────> 코드 바인딩 경로 및 심볼 불일치(Drift) 0건 검증
+[4. otlg lint 실행] ─────────────> 코드 바인딩 경로 및 심볼 불일치(Drift) 0건 검증
 ```
 
 ---
 
 ## 2. 세부 지침
 
-### Step 1: 컨텍스트 역추적 (`onto trace`)
-사용자로부터 기능 추가/수정 요구사항이 들어오면, 전체 소스 트리를 탐색하기 전에 가장 먼저 `onto trace`를 실행합니다.
+### Step 1: 컨텍스트 역추적 (`otlg trace`)
+사용자로부터 기능 추가/수정 요구사항이 들어오면, 전체 소스 트리를 탐색하기 전에 가장 먼저 `otlg trace`를 실행합니다.
 
 ```bash
-onto trace <keyword>
-# 예: onto trace attendance
-# 예: onto trace grading
+otlg trace <keyword>
+# 예: otlg trace attendance
+# 예: otlg trace grading
 ```
 
 - 추출되는 정보:
@@ -47,10 +47,10 @@ onto trace <keyword>
 - `Direct Code Touchpoints`에 명시된 파일 이외의 엉뚱한 레이어를 임의로 수정하지 않습니다.
 - 백엔드 서비스 계층과 프론트엔드 피처 컴포넌트 간의 계약을 준수합니다.
 
-### Step 4: 정적 검증 (`onto lint`)
+### Step 4: 정적 검증 (`otlg lint`)
 수정이 완료된 후, 온톨로지와 코드 간의 어긋남이 없는지 최종 검증합니다.
 
 ```bash
-onto lint
+otlg lint
 ```
 - 모든 검증이 통과(`0 violations`)되어야 작업을 완료할 수 있습니다.
