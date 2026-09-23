@@ -10,7 +10,7 @@ class CodeBindingBackend(BaseModel):
     model: Optional[str] = None
     schema_: Optional[str] = Field(default=None, alias="schema")
     service: Optional[str] = None
-    api: Optional[str] = None
+    api: Optional[str | List[str]] = None
 
 
 class CodeBindingFrontend(BaseModel):
@@ -57,6 +57,7 @@ class LinkSpec(BaseModel):
     source: str
     target: str
     cardinality: str  # one_to_one | one_to_many | many_to_one | many_to_many
+    through: Optional[str] = None
     foreign_key: Optional[str] = None
     description: Optional[str] = None
 
@@ -67,7 +68,7 @@ class LinkTypeDoc(BaseModel):
 
 class ActorSpec(BaseModel):
     type: str
-    role: Optional[str] = None
+    role: Optional[str | List[str]] = None
     permission: Optional[str] = None
 
 

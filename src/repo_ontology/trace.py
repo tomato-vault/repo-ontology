@@ -109,6 +109,12 @@ def _extract_files(binding_dict: Dict[str, Any], files_set: Set[str]) -> None:
     for val in binding_dict.values():
         if isinstance(val, dict):
             _extract_files(val, files_set)
+        elif isinstance(val, list):
+            for item in val:
+                if isinstance(item, str) and not item.startswith(("GET ", "POST ", "PUT ", "PATCH ", "DELETE ")):
+                    clean_path = item.split(":")[0].strip()
+                    if clean_path:
+                        files_set.add(clean_path)
         elif isinstance(val, str) and not val.startswith(("GET ", "POST ", "PUT ", "PATCH ", "DELETE ")):
             clean_path = val.split(":")[0].strip()
             if clean_path:

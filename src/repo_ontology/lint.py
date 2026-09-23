@@ -53,9 +53,14 @@ def _verify_code_path(
     if symbol and target_file.is_file():
         try:
             content = target_file.read_text(encoding="utf-8", errors="ignore")
-            # Pattern matching for Python/TS/Dart class/def
-            pattern = rf"\b(class|def|function|const|var|let)\s+{re.escape(symbol)}\b"
-            if not re.search(pattern, content) and symbol not in content:
+            # Check symbol or class/method parts
+            symbols_to_check = [symbol]
+            if "." in symbol:
+                cls_part, method_part = symbol.split(".", 1)
+                symbols_to_check.extend([cls_part, method_part])
+
+            found = any(s in content for s in symbols_to_check)
+            if not found:
                 issues.append(
                     LintIssue(
                         severity="WARNING",
