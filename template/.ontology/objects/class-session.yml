@@ -1,0 +1,34 @@
+object: ClassSession
+domain: "education"
+tags: ["class", "attendance", "session"]
+description: "반(Class)의 특정 일자 수업 세션 및 출석 진행 상태"
+
+properties:
+  id:
+    type: uuid
+    primary_key: true
+  course_id:
+    type: uuid
+    required: true
+  session_date:
+    type: date
+    required: true
+  start_time:
+    type: time
+    required: true
+  end_time:
+    type: time
+    required: true
+  status:
+    type: enum
+    values: ["SCHEDULED", "IN_PROGRESS", "COMPLETED", "CANCELLED"]
+    default: "SCHEDULED"
+
+code_binding:
+  backend:
+    model: "backend/app/models/class_session.py:ClassSession"
+    schema: "backend/app/schemas/class_session.py:ClassSessionResponse"
+  frontend:
+    entity: "frontend/src/entities/class-session"
+  mobile:
+    model: "mobile/lib/data/models/class_session.dart"

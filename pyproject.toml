@@ -1,0 +1,34 @@
+[project]
+name = "repo-ontology"
+version = "0.1.0"
+description = "Palantir-grade executable domain ontology template and CLI tool for code repositories"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic>=2.7.0",
+    "pyyaml>=6.0.1",
+    "rich>=13.7.0",
+]
+
+[project.scripts]
+repo-ontology = "repo_ontology.__main__:main"
+onto = "repo_ontology.__main__:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/repo_ontology"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"template" = "repo_ontology/template"

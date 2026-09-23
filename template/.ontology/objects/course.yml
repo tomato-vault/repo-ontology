@@ -1,0 +1,36 @@
+object: Course
+domain: "education"
+tags: ["course", "curriculum"]
+description: "강사가 개설하고 학생이 수강하는 교육 과정 단위"
+
+properties:
+  id:
+    type: uuid
+    primary_key: true
+  title:
+    type: string
+    required: true
+    description: "강의 제목"
+  instructor_id:
+    type: uuid
+    required: true
+    description: "담당 강사 User.id"
+  status:
+    type: enum
+    values: ["DRAFT", "PUBLISHED", "ARCHIVED"]
+    default: "DRAFT"
+  max_students:
+    type: integer
+    default: 30
+  created_at:
+    type: datetime
+    required: true
+
+code_binding:
+  backend:
+    model: "backend/app/models/course.py:Course"
+    schema: "backend/app/schemas/course.py:CourseResponse"
+  frontend:
+    entity: "frontend/src/entities/course"
+  mobile:
+    model: "mobile/lib/data/models/course.dart"

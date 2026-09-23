@@ -1,0 +1,33 @@
+function: CalculateAttendanceRate
+domain: "education"
+tags: ["attendance", "analytics", "calculation"]
+description: "학생의 특정 코스 또는 전체 수업 세션에 대한 출석률(%)을 실시간 집계 계산한다."
+
+inputs:
+  student_id:
+    type: uuid
+    required: true
+  course_id:
+    type: uuid
+    required: true
+
+output:
+  type: object
+  properties:
+    total_sessions: { type: integer }
+    attended_sessions: { type: integer }
+    late_sessions: { type: integer }
+    absent_sessions: { type: integer }
+    excused_sessions: { type: integer }
+    attendance_rate: { type: float, unit: "percent", range: [0.0, 100.0] }
+
+# 도출 계산 로직 / 공식
+computation:
+  formula: "(attended_sessions + late_sessions * 0.5 + excused_sessions) / total_sessions * 100"
+
+code_binding:
+  backend:
+    service: "backend/app/services/attendance_service.py:calculate_attendance_rate"
+    api: "GET /api/v1/students/{student_id}/courses/{course_id}/attendance-rate"
+  frontend:
+    entity: "frontend/src/entities/attendance"

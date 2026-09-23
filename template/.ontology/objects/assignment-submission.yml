@@ -1,0 +1,41 @@
+object: AssignmentSubmission
+domain: "education"
+tags: ["assignment", "grading", "submission"]
+description: "학생이 코스 과제에 제출한 답안 및 평가 상태"
+
+properties:
+  id:
+    type: uuid
+    primary_key: true
+  course_id:
+    type: uuid
+    required: true
+  student_id:
+    type: uuid
+    required: true
+  status:
+    type: enum
+    values: ["DRAFT", "SUBMITTED", "RESUBMITTED", "GRADED"]
+    default: "DRAFT"
+  score:
+    type: integer
+    range: [0, 100]
+    nullable: true
+  feedback:
+    type: text
+    nullable: true
+  submitted_at:
+    type: datetime
+    nullable: true
+  graded_at:
+    type: datetime
+    nullable: true
+
+code_binding:
+  backend:
+    model: "backend/app/models/assignment.py:AssignmentSubmission"
+    schema: "backend/app/schemas/assignment.py:AssignmentSubmissionSchema"
+  frontend:
+    entity: "frontend/src/entities/assignment"
+  mobile:
+    model: "mobile/lib/data/models/assignment_submission.dart"

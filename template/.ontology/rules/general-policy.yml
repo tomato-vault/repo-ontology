@@ -1,0 +1,12 @@
+rules:
+  - id: "INSTRUCTOR_COURSE_OWNERSHIP"
+    name: "강사 코스 권한 불변식"
+    domain: "education"
+    description: "강사는 자신이 개설한 코스의 데이터(세션, 과제, 학생 성적)만 수정할 수 있다."
+    scope: ["Course", "AssignmentSubmission", "ClassSession"]
+
+  - id: "STUDENT_SUBMISSION_DEADLINE"
+    name: "과제 마감 기한 불변식"
+    domain: "education"
+    description: "마감 시각이 지난 과제는 지각 제출 플래그가 붙거나 제출이 차단되어야 한다."
+    scope: ["AssignmentSubmission"]

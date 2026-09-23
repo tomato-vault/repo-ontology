@@ -1,0 +1,43 @@
+object: User
+domain: "auth"
+tags: ["auth", "user", "rbac"]
+description: "시스템의 모든 행위자(강사, 학생, 관리자)의 기본 식별 객체"
+
+properties:
+  id:
+    type: uuid
+    primary_key: true
+    description: "사용자 고유 식별자"
+  email:
+    type: string
+    unique: true
+    required: true
+    description: "로그인용 이메일"
+  name:
+    type: string
+    required: true
+    description: "사용자 실명"
+  role:
+    type: enum
+    values: ["ADMIN", "INSTRUCTOR", "STUDENT"]
+    required: true
+    description: "역할 권한 구분"
+  is_active:
+    type: boolean
+    default: true
+    description: "계정 활성화 상태"
+  created_at:
+    type: datetime
+    required: true
+  updated_at:
+    type: datetime
+    nullable: true
+
+code_binding:
+  backend:
+    model: "backend/app/models/user.py:User"
+    schema: "backend/app/schemas/user.py:UserResponse"
+  frontend:
+    entity: "frontend/src/entities/user"
+  mobile:
+    model: "mobile/lib/data/models/user.dart"

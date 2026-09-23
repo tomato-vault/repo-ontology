@@ -1,0 +1,35 @@
+version: "1.0.0"
+project:
+  name: "My Project"
+  description: "Repository domain ontology configuration"
+  repository_url: ""
+
+# 도메인 아키텍처 스택 정의 (코드 바인딩 경로 검증 및 스캐폴딩 기준)
+stack:
+  backend:
+    framework: "fastapi"       # fastapi | django | rails | spring | etc
+    root: "backend"
+    architecture: "layered"    # layered | clean | ddd
+  frontend:
+    framework: "react"         # react | nextjs | vue
+    root: "frontend"
+    architecture: "fsd"        # fsd | atomic | modular
+  mobile:
+    framework: "flutter"       # flutter | react-native | native
+    root: "mobile"
+    architecture: "mvvm"
+
+# 기능 및 도메인 분류 목록
+domains:
+  - id: "auth"
+    name: "인증 및 권한"
+    description: "사용자 로그인, 세션, RBAC 역할 관리"
+  - id: "education"
+    name: "교육 및 코스 관리"
+    description: "강의, 수업 세션, 출석, 과제 및 평가"
+
+# 거버넌스 문서 매핑
+governance:
+  adr_dir: "docs/adr"
+  tech_debt_file: "docs/tech-debt.md"
+  watchlist_file: "docs/deferred-watchlist.md"

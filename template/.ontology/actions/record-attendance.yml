@@ -1,0 +1,55 @@
+action: RecordAttendance
+domain: "education"
+tags: ["attendance", "class", "session"]
+description: "강사가 특정 수업 세션에서 학생의 출석 상태(출석, 결석, 지각, 공결)를 기록하거나 수정한다."
+
+actor:
+  type: User
+  role: "INSTRUCTOR"
+  permission: "attendance:write"
+
+target:
+  object: ClassSession
+  lookup: "id"
+
+parameters:
+  student_id:
+    type: uuid
+    required: true
+  status:
+    type: enum
+    values: ["PRESENT", "ABSENT", "LATE", "EXCUSED"]
+    required: true
+  note:
+    type: text
+    required: false
+    description: "사유 또는 비고"
+
+preconditions:
+  - id: "SESSION_NOT_CANCELLED"
+    rule: "target.status != 'CANCELLED'"
+    error: "취소된 수업 세션에는 출석을 기록할 수 없습니다."
+  - id: "INSTRUCTOR_AUTHORIZED"
+    rule: "actor.id == target.course.instructor_id"
+    error: "해당 반의 담당 강사만 출석을 체크할 수 있습니다."
+
+effects:
+  mutate:
+    session.attendance_records: "upsert(student_id, params.status, params.note)"
+  events:
+    - name: "ATTENDANCE_RECORDED"
+      channel: "internal_event"
+
+code_binding:
+  backend:
+    service: "backend/app/services/attendance_service.py:record_attendance"
+    api: "POST /api/v1/sessions/{session_id}/attendance"
+  frontend:
+    feature: "frontend/src/features/attendance-tracker"
+  mobile:
+    viewmodel: "mobile/lib/features/attendance/viewmodels/attendance_viewmodel.dart"
+
+governance:
+  feature_id: "F23"
+  adr: "docs/adr/0012-attendance-recording-flow.md"
+  tech_debt: null

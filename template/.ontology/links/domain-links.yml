@@ -1,0 +1,28 @@
+links:
+  - name: CourseInstructor
+    source: Course
+    target: User
+    cardinality: "many_to_one"
+    foreign_key: "Course.instructor_id -> User.id"
+    description: "각 코스는 정확히 1명의 담당 강사를 가진다."
+
+  - name: CourseSubmissions
+    source: Course
+    target: AssignmentSubmission
+    cardinality: "one_to_many"
+    foreign_key: "AssignmentSubmission.course_id -> Course.id"
+    description: "각 코스는 여러 개의 과제 제출물을 포함한다."
+
+  - name: StudentSubmissions
+    source: User
+    target: AssignmentSubmission
+    cardinality: "one_to_many"
+    foreign_key: "AssignmentSubmission.student_id -> User.id"
+    description: "학생은 여러 과제 제출물을 소유한다."
+
+  - name: CourseSessions
+    source: Course
+    target: ClassSession
+    cardinality: "one_to_many"
+    foreign_key: "ClassSession.course_id -> Course.id"
+    description: "코스는 여러 수업 세션을 진행한다."
