@@ -62,7 +62,8 @@ class TraceResult:
                     enf = r["enforcement"]
                     if isinstance(enf, dict):
                         for k, v in enf.items():
-                            lines.append(f"  - Enforcement ({k}): {', '.join(v)}")
+                            v_str = ", ".join(v) if isinstance(v, list) else str(v)
+                            lines.append(f"  - Enforcement ({k}): {v_str}")
                     elif isinstance(enf, list):
                         lines.append(f"  - Enforcement: {', '.join(enf)}")
                     else:
