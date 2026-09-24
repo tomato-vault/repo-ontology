@@ -17,6 +17,8 @@ from repo_ontology.models import (
     OntologyConfig,
     RuleSpec,
     RuleTypeDoc,
+    SiteMapDoc,
+    ViewSpec,
 )
 
 
@@ -40,6 +42,7 @@ class OntologyRegistry:
         self.actions: Dict[str, ActionType] = {}
         self.functions: Dict[str, FunctionType] = {}
         self.rules: List[RuleSpec] = []
+        self.views: Dict[str, ViewSpec] = {}
         self.errors: List[LoadError] = []
 
     @property
@@ -143,5 +146,36 @@ def load_ontology(project_root: Optional[Path] = None) -> OntologyRegistry:
                 registry.rules.extend(rule_doc.rules)
             except Exception as e:
                 registry.errors.append(LoadError(path, f"Rule parse error: {e}", e))
+
+    # 7. Load sitemap.yml and views/
+    sitemap_file = onto_dir / "sitemap.yml"
+    if sitemap_file.is_file():
+        try:
+            with open(sitemap_file, "r", encoding="utf-8") as f:
+                data = yaml.safe_load(f) or {}
+            if isinstance(data, list):
+                doc = SiteMapDoc(views=[ViewSpec.model_validate(v) for v in data])
+            else:
+                doc = SiteMapDoc.model_validate(data)
+            for v in doc.views:
+                registry.views[v.view] = v
+        except Exception as e:
+            registry.errors.append(LoadError(sitemap_file, f"SiteMap parse error: {e}", e))
+
+    views_dir = onto_dir / "views"
+    if views_dir.is_dir():
+        for path in sorted(views_dir.glob("*.yml")) + sorted(views_dir.glob("*.yaml")):
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    data = yaml.safe_load(f) or {}
+                if isinstance(data, list):
+                    for item in data:
+                        v = ViewSpec.model_validate(item)
+                        registry.views[v.view] = v
+                else:
+                    v = ViewSpec.model_validate(data)
+                    registry.views[v.view] = v
+            except Exception as e:
+                registry.errors.append(LoadError(path, f"View parse error: {e}", e))
 
     return registry

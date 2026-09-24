@@ -71,6 +71,8 @@ def cmd_info(args: argparse.Namespace) -> int:
     table.add_row("Actions (Mutations)", str(len(registry.actions)), ", ".join(sorted(registry.actions.keys())))
     table.add_row("Functions (Computations)", str(len(registry.functions)), ", ".join(sorted(registry.functions.keys())))
     table.add_row("Rules (Invariants)", str(len(registry.rules)), ", ".join(r.id for r in registry.rules))
+    if registry.views:
+        table.add_row("Views (UI / Screens)", str(len(registry.views)), f"{len(registry.views)} mapped")
 
     console.print(table)
     return 0
@@ -145,6 +147,94 @@ def cmd_scaffold(args: argparse.Namespace) -> int:
         return 1
 
 
+def cmd_translate(args: argparse.Namespace) -> int:
+    from repo_ontology.translate import match_views, render_view_spec
+
+    target = Path(args.path) if args.path else None
+    try:
+        registry = load_ontology(target)
+    except Exception as e:
+        error_console.print(f"[bold red]Error loading ontology:[/bold red] {e}")
+        return 1
+    if _report_load_errors(registry):
+        return 1
+
+    if not registry.views:
+        console.print("[yellow]No views defined in .ontology/sitemap.yml or .ontology/views/[/yellow]")
+        console.print("Add view definitions to map UI page hierarchies to ontology primitives.")
+        return 0
+
+    results = match_views(registry, args.query)
+    if not results:
+        console.print(f"[bold yellow]No matching view found for:[/bold yellow] '{args.query}'")
+        console.print(f"Registered views ({len(registry.views)}): {', '.join(sorted(registry.views.keys()))}")
+        return 1
+
+    console.print(f"Found [bold green]{len(results)}[/bold green] view match(es) for '[bold]{args.query}[/bold]':\n")
+    for view, score, reason in results[:args.limit]:
+        console.print(f"[dim]Match Confidence: {score:.1f}% ({reason})[/dim]")
+        render_view_spec(registry, view)
+        console.print("")
+
+    return 0
+
+
+def cmd_intake(args: argparse.Namespace) -> int:
+    from repo_ontology.intake import analyze_requirements, generate_markdown_report, parse_excel_file
+
+    input_path = Path(args.file).resolve()
+    if not input_path.is_file():
+        error_console.print(f"[bold red]File not found:[/bold red] {input_path}")
+        return 1
+
+    target = Path(args.path) if args.path else None
+    try:
+        registry = load_ontology(target)
+    except Exception as e:
+        error_console.print(f"[bold red]Error loading ontology:[/bold red] {e}")
+        return 1
+    if _report_load_errors(registry):
+        return 1
+
+    console.print(f"Reading requirements from: [bold cyan]{input_path.name}[/bold cyan]...")
+    try:
+        items = parse_excel_file(input_path)
+    except Exception as e:
+        error_console.print(f"[bold red]Error parsing requirements file:[/bold red] {e}")
+        return 1
+
+    if not items:
+        console.print("[yellow]No requirements rows found in file.[/yellow]")
+        return 0
+
+    matched, unmatched = analyze_requirements(registry, items)
+
+    # Console summary
+    table = Table(title=f"Requirements Intake Summary ({input_path.name})", border_style="cyan")
+    table.add_column("Category", style="bold")
+    table.add_column("Count", justify="right")
+    table.add_column("Description")
+
+    table.add_row("Total Requirements", str(len(items)), "Total rows extracted from sheets")
+    table.add_row("Matched (Modifications)", f"[bold green]{len(matched)}[/bold green]", "Existing views in sitemap (ready for impact trace & TDD)")
+    table.add_row("Unmatched (New Specs)", f"[bold yellow]{len(unmatched)}[/bold yellow]", "New screens/menus requiring scaffolding")
+
+    console.print(table)
+
+    # Generate Markdown Report
+    report_content = generate_markdown_report(registry, matched, unmatched, input_path.name)
+
+    out_path = Path(args.output).resolve() if args.output else registry.ontology_dir / "intake_report.md"
+    try:
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(report_content, encoding="utf-8")
+        console.print(f"[bold green]✓[/bold green] Generated detailed impact report: [bold]{out_path}[/bold]")
+    except Exception as e:
+        error_console.print(f"[bold red]Failed to save report:[/bold red] {e}")
+
+    return 0
+
+
 def main(argv: Optional[list] = None) -> int:
     parser = argparse.ArgumentParser(
         prog="otlg",
@@ -185,6 +275,20 @@ def main(argv: Optional[list] = None) -> int:
     p_scaffold.add_argument("name", help="Name of element in PascalCase (e.g., AttendanceRecord)")
     p_scaffold.add_argument("--domain", "-d", default="core", help="Domain category")
     p_scaffold.set_defaults(func=cmd_scaffold)
+
+    # translate
+    p_translate = subparsers.add_parser("translate", help="Translate page code or menu hierarchy to ontology views & full-stack bindings")
+    p_translate.add_argument("query", help="Page code, menu path keyword, or screen name (e.g. '출석체크', 'S-COM-001')")
+    p_translate.add_argument("path", nargs="?", default=None, help="Project path")
+    p_translate.add_argument("--limit", "-n", type=int, default=3, help="Max results to display")
+    p_translate.set_defaults(func=cmd_translate)
+
+    # intake
+    p_intake = subparsers.add_parser("intake", help="Intake PRD / requirements Excel file and translate to ontology impact report")
+    p_intake.add_argument("file", help="Path to requirements file (.xlsx, .csv)")
+    p_intake.add_argument("path", nargs="?", default=None, help="Project path")
+    p_intake.add_argument("--output", "-o", default=None, help="Output markdown report path (default: .ontology/intake_report.md)")
+    p_intake.set_defaults(func=cmd_intake)
 
     args = parser.parse_args(argv)
     return args.func(args)

@@ -259,3 +259,43 @@ class OntologyConfig(OntologyModel):
     domains: List[DomainConfig] = Field(default_factory=list)
     stack: Optional[StackConfig] = None
     governance: Optional[GovernanceConfig] = None
+
+
+class ViewBindingFrontend(OntologyModel):
+    route: Optional[str] = None
+    slice: Optional[str] = None
+    component: Optional[str] = None
+    components: Optional[List[str]] = Field(default_factory=list)
+
+
+class ViewBindingBackend(OntologyModel):
+    router: Optional[str] = None
+    endpoints: Optional[List[str]] = Field(default_factory=list)
+    services: Optional[List[str]] = Field(default_factory=list)
+
+
+class ViewBindingOntology(OntologyModel):
+    objects: Optional[List[str]] = Field(default_factory=list)
+    actions: Optional[List[str]] = Field(default_factory=list)
+    functions: Optional[List[str]] = Field(default_factory=list)
+    rules: Optional[List[str]] = Field(default_factory=list)
+
+
+class ViewBinding(OntologyModel):
+    frontend: Optional[ViewBindingFrontend] = None
+    backend: Optional[ViewBindingBackend] = None
+    ontology: Optional[ViewBindingOntology] = None
+    mobile: Optional[Dict[str, Any]] = None
+
+
+class ViewSpec(OntologyModel):
+    view: str = Field(description="화면 고유 식별자, 예: AttendanceCheckView")
+    page_code: Optional[str] = Field(default=None, description="기획서 페이지 코드, 예: S-COM-001, P-TOOL-001")
+    menu: str = Field(description="메뉴 뎁스 경로, 예: 관리자/강사 > 데이터관리 > 수업데이터관리 > 출석체크")
+    description: Optional[str] = None
+    roles: Optional[List[str]] = Field(default_factory=list)
+    binding: Optional[ViewBinding] = None
+
+
+class SiteMapDoc(OntologyModel):
+    views: List[ViewSpec] = Field(default_factory=list)
