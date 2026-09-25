@@ -64,40 +64,39 @@ flowchart TD
 
 When a developer or agent inputs a feature query, `otlg` returns all required domain constraints and code paths in milliseconds:
 
-```text
-╭───────────────────────── Ontology Trace: attendance ─────────────────────────╮
-│ # Ontology Trace: `attendance`                                               │
-│                                                                              │
-│ Matched Domains: education                                                   │
-│                                                                              │
-│ ## 📦 Affected Objects                                                       │
-│ - AssignmentSubmission (education): Student submission and grading status    │
-│   - Properties: id, course_id, student_id, status, score, feedback           │
-│ - ClassSession (education): Scheduled class session and attendance tracking  │
-│   - Properties: id, course_id, session_date, start_time, end_time, status    │
-│ - Course (education): Academic course unit created by instructor             │
-│   - Properties: id, title, instructor_id, status, max_students, created_at   │
-│                                                                              │
-│ ## ⚡ Affected Actions                                                       │
-│ - GradeSubmission → AssignmentSubmission: Instructor grades submission       │
-│   - Precondition: target.status in ['SUBMITTED', 'RESUBMITTED']              │
-│   - Precondition: actor.id == target.course.instructor_id                    │
-│ - RecordAttendance → ClassSession: Record student attendance status          │
-│   - Precondition: target.status != 'CANCELLED'                               │
-│   - Precondition: actor.id == target.course.instructor_id                    │
-│                                                                              │
-│ ## 🛡️ Relevant Rules & Invariants                                            │
-│ - INSTRUCTOR_COURSE_OWNERSHIP: Instructors can only mutate own courses       │
-│ - STUDENT_SUBMISSION_DEADLINE: Late submissions require flag or block        │
-│                                                                              │
-│ ## 📂 Source Code Paths                                                      │
-│ - backend/app/models/assignment.py                                           │
-│ - backend/app/models/class_session.py                                        │
-│ - backend/app/services/attendance_service.py                                 │
-│ - frontend/src/entities/attendance                                           │
-│ - frontend/src/features/attendance-tracker                                   │
-│ - mobile/lib/features/attendance/viewmodels/attendance_viewmodel.dart        │
-╰──────────────────────────────────────────────────────────────────────────────╯
+```console
+$ otlg trace attendance
+
+# Ontology Trace: `attendance`
+Matched Domains: education
+
+## 📦 Affected Objects
+- AssignmentSubmission (education): Student submission and grading status
+  - Properties: id, course_id, student_id, status, score, feedback
+- ClassSession (education): Scheduled class session and attendance tracking
+  - Properties: id, course_id, session_date, start_time, end_time, status
+- Course (education): Academic course unit created by instructor
+  - Properties: id, title, instructor_id, status, max_students, created_at
+
+## ⚡ Affected Actions
+- GradeSubmission → AssignmentSubmission: Instructor grades submission
+  - Precondition: target.status in ['SUBMITTED', 'RESUBMITTED']
+  - Precondition: actor.id == target.course.instructor_id
+- RecordAttendance → ClassSession: Record student attendance status
+  - Precondition: target.status != 'CANCELLED'
+  - Precondition: actor.id == target.course.instructor_id
+
+## 🛡️ Relevant Rules & Invariants
+- INSTRUCTOR_COURSE_OWNERSHIP: Instructors can only mutate own courses
+- STUDENT_SUBMISSION_DEADLINE: Late submissions require flag or block
+
+## 📂 Source Code Paths
+- backend/app/models/assignment.py
+- backend/app/models/class_session.py
+- backend/app/services/attendance_service.py
+- frontend/src/entities/attendance
+- frontend/src/features/attendance-tracker
+- mobile/lib/features/attendance/viewmodels/attendance_viewmodel.dart
 ```
 
 ---

@@ -64,41 +64,39 @@ flowchart TD
 
 요구사항 키워드를 입력하면, 에이전트에게 필요한 모든 도메인 지식과 파일 경로가 구조화되어 즉시 반환됩니다.
 
-```text
-╭───────────────────────── Ontology Trace: attendance ─────────────────────────╮
-│ # Ontology Trace: `attendance`                                               │
-│                                                                              │
-│ Matched Domains: education                                                   │
-│                                                                              │
-│ ## 📦 Affected Objects                                                       │
-│ - AssignmentSubmission (education): 학생이 코스 과제에 제출한 답안 및 평가 상태│
-│   - Properties: id, course_id, student_id, status, score, feedback           │
-│ - ClassSession (education): 반(Class)의 특정 일자 수업 세션 및 출석 진행 상태│
-│   - Properties: id, course_id, session_date, start_time, end_time, status    │
-│ - Course (education): 강사가 개설하고 학생이 수강하는 교육 과정 단위         │
-│   - Properties: id, title, instructor_id, status, max_students, created_at   │
-│                                                                              │
-│ ## ⚡ Affected Actions                                                       │
-│ - GradeSubmission → AssignmentSubmission: 강사가 학생의 과제 제출물을        │
-│   검토하고 점수와 피드백을 부여한다.                                         │
-│   - Precondition: target.status in ['SUBMITTED', 'RESUBMITTED']              │
-│   - Precondition: actor.id == target.course.instructor_id                    │
-│ - RecordAttendance → ClassSession: 강사가 수업 세션에서 출석 상태를 기록     │
-│   - Precondition: target.status != 'CANCELLED'                               │
-│   - Precondition: actor.id == target.course.instructor_id                    │
-│                                                                              │
-│ ## 🛡️ Relevant Rules & Invariants                                            │
-│ - INSTRUCTOR_COURSE_OWNERSHIP: 강사는 자신이 개설한 코스의 데이터만 수정     │
-│ - STUDENT_SUBMISSION_DEADLINE: 마감 시각이 지난 과제는 지각 플래그 필수      │
-│                                                                              │
-│ ## 📂 Source Code Paths                                                      │
-│ - backend/app/models/assignment.py                                           │
-│ - backend/app/models/class_session.py                                        │
-│ - backend/app/services/attendance_service.py                                 │
-│ - frontend/src/entities/attendance                                           │
-│ - frontend/src/features/attendance-tracker                                   │
-│ - mobile/lib/features/attendance/viewmodels/attendance_viewmodel.dart        │
-╰──────────────────────────────────────────────────────────────────────────────╯
+```console
+$ otlg trace attendance
+
+# Ontology Trace: `attendance`
+Matched Domains: education
+
+## 📦 Affected Objects
+- AssignmentSubmission (education): 학생이 코스 과제에 제출한 답안 및 평가 상태
+  - Properties: id, course_id, student_id, status, score, feedback
+- ClassSession (education): 반(Class)의 특정 일자 수업 세션 및 출석 진행 상태
+  - Properties: id, course_id, session_date, start_time, end_time, status
+- Course (education): 강사가 개설하고 학생이 수강하는 교육 과정 단위
+  - Properties: id, title, instructor_id, status, max_students, created_at
+
+## ⚡ Affected Actions
+- GradeSubmission → AssignmentSubmission: 강사가 학생의 과제 제출물을 검토하고 점수/피드백 부여
+  - Precondition: target.status in ['SUBMITTED', 'RESUBMITTED']
+  - Precondition: actor.id == target.course.instructor_id
+- RecordAttendance → ClassSession: 강사가 수업 세션에서 출석 상태를 기록
+  - Precondition: target.status != 'CANCELLED'
+  - Precondition: actor.id == target.course.instructor_id
+
+## 🛡️ Relevant Rules & Invariants
+- INSTRUCTOR_COURSE_OWNERSHIP: 강사는 자신이 개설한 코스의 데이터만 수정 가능
+- STUDENT_SUBMISSION_DEADLINE: 마감 시각이 지난 과제는 지각 플래그 필수
+
+## 📂 Source Code Paths
+- backend/app/models/assignment.py
+- backend/app/models/class_session.py
+- backend/app/services/attendance_service.py
+- frontend/src/entities/attendance
+- frontend/src/features/attendance-tracker
+- mobile/lib/features/attendance/viewmodels/attendance_viewmodel.dart
 ```
 
 ---
