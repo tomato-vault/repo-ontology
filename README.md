@@ -7,9 +7,9 @@
 
 ## 1. 개요
 
-`repo-ontology`는 엔터프라이즈 데이터 운영 체계인 **팔란티어(Palantir Foundry / AIP)**의 온톨로지 철학을 코드베이스 레포지토리에 이식한 시스템입니다.
+`repo-ontology`는 엔터프라이즈 데이터 운영 체계인 **팔란티어**(Palantir Foundry / AIP)의 온톨로지 철학을 코드베이스 레포지토리에 이식한 시스템입니다.
 
-현대 AI 에이전트(Claude Code, Antigravity, Cursor 등) 기반 개발에서 가장 큰 병목은 **"에이전트의 세션 초기화(기억상실증)"**와 **"도메인 비즈니스 불변식(Invariants)의 누락"**입니다. 
+현대 AI 에이전트(Claude Code, Antigravity, Cursor 등) 기반 개발에서 가장 큰 병목은 **에이전트의 세션 초기화**(기억상실증)와 **도메인 비즈니스 불변식**(Invariants) 누락입니다. 
 - 수기 마크다운 명세(`docs/features/`)는 코드가 수정되면 drift(어긋남)가 발생합니다.
 - 데이터베이스 ERD는 명사(테이블 형태)만 보여줄 뿐, 시스템에서 허용되는 상태 변경(동사, Action)과 권한을 통제하지 못합니다.
 
